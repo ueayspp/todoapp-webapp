@@ -27,7 +27,9 @@ import { useCookies } from "react-cookie";
 // import dayjs from "dayjs";
 import "dayjs/locale/th";
 
-function Main({ children }) {
+import MuiSnackBar from "./MuiSnackBar";
+
+function Main() {
   const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -75,6 +77,21 @@ function Main({ children }) {
   ]);
 
   const [data, setData] = useState([]);
+  /*
+    format date & time
+  */
+  // const dataFormat = data.map(function (a) {
+  //   return dayjs(a.when)
+  //     .locale("th")
+  //     .add(543, "year")
+  //     .format("D MMM YY [เวลา] hh:mm");
+  // });
+  // console.log(dataFormat);
+
+  // for (let i = 0; i < data.length; i++) {
+  //   const element = data[i];
+  //   element.when = dataFormat[i];
+  // }
 
   /* 
     custom theme font by adding typography
@@ -87,6 +104,14 @@ function Main({ children }) {
 
   let [cookies] = useCookies(["token"]);
 
+  const [display, setDisplay] = useState(false); // controls Alert
+  const [message, setMessage] = useState(""); // controls Message
+  const [severity, setSeverity] = useState("success"); // controls Severity
+
+  const callback = () => {
+    setDisplay(false);
+  };
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/activities", {
@@ -96,23 +121,6 @@ function Main({ children }) {
       .then((response) => {
         const data = response.data;
         console.log(data);
-
-        // /*
-        //   format date & time
-        // */
-        // const dataFormat = data.map(function (a) {
-        //   return dayjs(a.when)
-        //     .locale("th")
-        //     .add(543, "year")
-        //     .format("D MMM YY [เวลา] hh:mm");
-        // });
-        // console.log(dataFormat);
-
-        // for (let i = 0; i < data.length; i++) {
-        //   const element = data[i];
-        //   element.when = dataFormat[i];
-        // }
-
         setData(data);
       })
       .catch((error) => {
@@ -122,6 +130,12 @@ function Main({ children }) {
           console.log(error.response.status);
         }
       });
+  }, []);
+
+  useEffect(() => {
+    setMessage("Login Success!");
+    setSeverity("info");
+    setDisplay(true);
   }, []);
 
   return (
@@ -161,9 +175,11 @@ function Main({ children }) {
                         newData.id = response.data.id;
                         setData([...data, newData]);
                         /* 
-                          alert success "POST"
+                          alert SUCCESS "POST"
                         */
-                        alert("add success");
+                        setMessage("Add!");
+                        setSeverity("success");
+                        setDisplay(true);
                       })
                       .catch((error) => {
                         if (error.code === "ECONNABORTED") {
@@ -171,6 +187,12 @@ function Main({ children }) {
                         } else {
                           console.log(error.response.status);
                         }
+                        /* 
+                          alert ERROR "POST"
+                        */
+                        setMessage("Add Error!");
+                        setSeverity("error");
+                        setDisplay(true);
                       });
                     resolve();
                   }, 1000);
@@ -195,9 +217,11 @@ function Main({ children }) {
                         dataUpdate[index] = newData;
                         setData([...dataUpdate]);
                         /* 
-                          alert success "PUT" 
+                          alert SUCCESS "PUT" 
                         */
-                        alert("update success");
+                        setMessage("Update Success!");
+                        setSeverity("success");
+                        setDisplay(true);
                       })
                       .catch((error) => {
                         if (error.code === "ECONNABORTED") {
@@ -205,6 +229,12 @@ function Main({ children }) {
                         } else {
                           console.log(error.response.status);
                         }
+                        /* 
+                          alert ERROR "PUT"
+                        */
+                        setMessage("Update Error!");
+                        setSeverity("error");
+                        setDisplay(true);
                       });
                     resolve();
                   }, 1000);
@@ -228,9 +258,11 @@ function Main({ children }) {
                         dataDelete.splice(index, 1);
                         setData([...dataDelete]);
                         /* 
-                          alert success "DELETE" 
+                          alert SUCCESS "DELETE" 
                         */
-                        alert("delete success");
+                        setMessage("Delete Success!");
+                        setSeverity("success");
+                        setDisplay(true);
                       })
                       .catch((error) => {
                         if (error.code === "ECONNABORTED") {
@@ -238,6 +270,12 @@ function Main({ children }) {
                         } else {
                           console.log(error.response.status);
                         }
+                        /* 
+                          alert ERROR "DELETE"
+                        */
+                        setMessage("Delete Error!");
+                        setSeverity("error");
+                        setDisplay(true);
                       });
                     resolve();
                   }, 1000);
@@ -246,6 +284,11 @@ function Main({ children }) {
           />
         </ThemeProvider>
       </div>
+      {display ? (
+        <MuiSnackBar message={message} severity={severity} onClose={callback} />
+      ) : (
+        ``
+      )}
     </div>
   );
 }

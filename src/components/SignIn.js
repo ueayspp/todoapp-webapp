@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
+import MuiSnackBar from "./MuiSnackBar";
+
 function Copyright(props) {
   return (
     <Typography
@@ -44,6 +46,14 @@ export default function SignIn() {
 
   let [cookies, setCookie] = useCookies(["token"]);
 
+  const [display, setDisplay] = useState(false); // controls Alert
+  const [message, setMessage] = useState(""); // controls Message
+  const [severity, setSeverity] = useState("success"); // controls Severity
+
+  const callback = () => {
+    setDisplay(false);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -51,6 +61,15 @@ export default function SignIn() {
       id: data.get("id"),
       password: data.get("password"),
     });
+
+    /* 
+      check ID length
+    */
+    if (data.get("id").length !== 13) {
+      setMessage("ID must be 13 digits!");
+      setSeverity("warning");
+      setDisplay(true);
+    }
   };
 
   return (
@@ -132,6 +151,9 @@ export default function SignIn() {
                     } else {
                       console.log(error.response.status);
                     }
+                    setMessage("Id or Password doesn't correct!");
+                    setSeverity("warning");
+                    setDisplay(true);
                   });
               }}
             >
@@ -153,6 +175,11 @@ export default function SignIn() {
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
+      {display ? (
+        <MuiSnackBar message={message} severity={severity} onClose={callback} />
+      ) : (
+        ``
+      )}
     </ThemeProvider>
   );
 }
