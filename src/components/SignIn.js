@@ -19,6 +19,10 @@ import { useCookies } from "react-cookie";
 
 import MuiSnackBar from "./MuiSnackBar";
 
+import { InputAdornment, IconButton } from "@material-ui/core";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+
 function Copyright(props) {
   return (
     <Typography
@@ -53,6 +57,10 @@ export default function SignIn() {
   const callback = () => {
     setDisplay(false);
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -113,12 +121,26 @@ export default function SignIn() {
               required
               fullWidth
               value={password}
+              type={showPassword ? "text" : "password"} // This is where the magic happens!
               onChange={(event) => setPassword(event.target.value)}
               name="password"
               label="Password"
-              type="password"
               id="password"
               autoComplete="current-password"
+              InputProps={{
+                // This is where the toggle button is added.
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -151,6 +173,9 @@ export default function SignIn() {
                     } else {
                       console.log(error.response.status);
                     }
+                    /* 
+                      error Msg
+                    */
                     setMessage("Id or Password doesn't correct!");
                     setSeverity("warning");
                     setDisplay(true);
