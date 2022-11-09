@@ -24,8 +24,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
-// import dayjs from "dayjs";
 import "dayjs/locale/th";
+
+import dayjs from "dayjs";
+import TextField from "@mui/material/TextField";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 import MuiSnackBar from "./MuiSnackBar";
 
@@ -68,30 +73,28 @@ function Main() {
     {
       title: "วันเวลา",
       field: "when",
-
+      initialEditValue: "yyyy-MM-ddTHH:mm:ss",
+      /*
+        format date & time
+      */
+      render: ({ when }) =>
+        `${dayjs(when).locale("th").format("D MMM YY [เวลา] hh:mm")}`,
       /* 
         change to date&time picker
       */
-      initialEditValue: "yyyy-MM-ddTHH:mm:ss",
+      editComponent: ({ value, onChange }) => (
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DateTimePicker
+            renderInput={(props) => <TextField {...props} />}
+            value={value}
+            onChange={onChange}
+          />
+        </LocalizationProvider>
+      ),
     },
   ]);
 
   const [data, setData] = useState([]);
-  /*
-    format date & time
-  */
-  // const dataFormat = data.map(function (a) {
-  //   return dayjs(a.when)
-  //     .locale("th")
-  //     .add(543, "year")
-  //     .format("D MMM YY [เวลา] hh:mm");
-  // });
-  // console.log(dataFormat);
-
-  // for (let i = 0; i < data.length; i++) {
-  //   const element = data[i];
-  //   element.when = dataFormat[i];
-  // }
 
   /* 
     custom theme font by adding typography
@@ -216,6 +219,7 @@ function Main() {
                         const index = oldData.tableData.id;
                         dataUpdate[index] = newData;
                         setData([...dataUpdate]);
+                        console.log(newData);
                         /* 
                           alert SUCCESS "PUT" 
                         */
