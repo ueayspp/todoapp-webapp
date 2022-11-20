@@ -24,9 +24,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 
-import "dayjs/locale/th";
-
 import dayjs from "dayjs";
+import "dayjs/locale/th";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
 import TextField from "@mui/material/TextField";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -35,6 +37,10 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import MuiSnackBar from "./MuiSnackBar";
 
 function Main() {
+  dayjs.locale("th");
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
   const tableIcons = {
     Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
     Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -78,7 +84,9 @@ function Main() {
         format date & time
       */
       render: ({ when }) =>
-        `${dayjs(when).locale("th").format("D MMM YY [เวลา] hh:mm")}`,
+        `${dayjs(when)
+          .tz("Asia/Bangkok")
+          .format("D MMM YY [เวลา] hh:mm [น.]")}`,
       /* 
         change to date&time picker
       */
